@@ -1,5 +1,6 @@
 // components/VariableButtons.tsx
 import React from 'react';
+import styles from './MessageVariables.module.css'
 
 interface VariableButtonsProps {
     arrVarNames: string[];
@@ -8,9 +9,14 @@ interface VariableButtonsProps {
 
 function MessageVariables({ arrVarNames, onClick }: VariableButtonsProps) {
     return (
-        <div>
+        <div className={styles.container}>
             {arrVarNames.map((varName) => (
-                <button key={varName} onClick={() => onClick(varName)}>
+                <button
+                    key={varName}
+                    onClick={() => onClick(varName)}
+                    className={styles.btn}
+                >
+
                     {'{' + varName + '}'}
                 </button>
             ))}

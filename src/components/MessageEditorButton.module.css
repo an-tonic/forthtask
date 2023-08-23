@@ -1,0 +1,27 @@
+/* components/MessageTemplateEditor.module.css */
+.btn {
+    background-color: #343f4b;
+    color: #fdfdfe;
+    border: none;
+    padding: 8px 12px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    background-color: #2c3943;
+    color: #e0e0e0;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+}

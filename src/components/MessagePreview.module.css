@@ -1,0 +1,100 @@
+/* MessagePreview.module.css */
+.preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.previewContent {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+    width: 80%;
+    max-width: 500px;
+}
+
+.previewHeader {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.previewText {
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 20px;
+    background-color: #4f505b;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.inputContainer {
+    position: relative;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+
+}
+
+.inputLabel {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: all 0.3s;
+    color: #999;
+}
+
+.inputField {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.inputField:focus, .inputField:not(:placeholder-shown) {
+    padding: 18px 10px 2px;
+}
+
+/* Style for when the input is not empty */
+.inputField:not(:placeholder-shown) + .inputLabel,
+.inputField:focus + .inputLabel {
+    top: 0;
+    font-size: 12px;
+    transform: translate(-9px, 4px);
+    padding: 0 5px;
+}
+
+
+.previewButton {
+    background-color: #343f4b;
+    color: #fdfdfe;
+    border: none;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.previewButton:hover {
+    background-color: #4f4f58;
+}
+
+.previewButton:focus {
+    outline: none;
+}
+
+.previewButton:active {
+    transform: scale(0.98);
+}

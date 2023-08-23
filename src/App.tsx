@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import MessageEditorButton from './components/MessageEditorButton';
 import MessageTemplateEditor from './components/MessageTemplateEditor';
 
+
 function App() {
     const [showEditor, setShowEditor] = useState(false);
-    
-    const [template, setTemplate] = useState<string | null>(localStorage.getItem('template'));
-
-
+    const [template, setTemplate] = useState<string>(localStorage.getItem('template')!);
     const arrVarNames = localStorage.getItem('arrVarNames') !== null
         ? JSON.parse(localStorage.arrVarNames)
         : ['firstname', 'lastname', 'company', 'position'];
+
 
     const handleOpenEditor = () => {
         setShowEditor(true);
@@ -20,18 +19,19 @@ function App() {
         setShowEditor(false);
     };
 
-    const handleSaveTemplate = (newTemplate: string) => {
-        setTemplate(newTemplate);
-        // You can also save the template to localStorage or perform any other necessary actions.
+    const handleSaveTemplate = async (newTemplate: string) => {
+        await localStorage.setItem('template', newTemplate);
+        await setTemplate(newTemplate);
     };
 
 
     return (
-        <div className="App">
+        <>
 
             { !showEditor && (<MessageEditorButton
                 onClick={handleOpenEditor}
-                name={'Message Editor'}/>
+                name={'Message Editor'}
+                />
             )}
 
             {showEditor && (<>
@@ -42,11 +42,13 @@ function App() {
 
                     <MessageEditorButton
                     onClick={handleCloseEditor}
-                    name={'Close'}/>
+                    name={'Close'}
+
+                    />
                 </>
             )}
 
-        </div>
+        </>
     );
 }
 

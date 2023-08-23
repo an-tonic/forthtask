@@ -1,14 +1,18 @@
-
-import React from 'react';
+import styles from './MessageEditorButton.module.css'; // Import the CSS module
 
 interface MessageEditorButtonProps {
-    name : string;
     onClick: () => void; // This will be the click handler for opening the message editor
+    name : string;
+
 }
 
-function MessageEditorButton({ onClick, name }: MessageEditorButtonProps) {
+function MessageEditorButton({ onClick, name}: MessageEditorButtonProps) {
     return (
-        <button onClick={onClick}>{name}</button>
+        <button
+            className={styles.btn}
+            onClick={onClick}
+        >{name}
+        </button>
     );
 }
 
