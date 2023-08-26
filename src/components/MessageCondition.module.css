@@ -1,0 +1,16 @@
+/* MessageCondition.module.css */
+
+.condition {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0 10px auto;
+}
+
+.label {
+    font-weight: bold;
+}
+
+
+
