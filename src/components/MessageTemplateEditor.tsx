@@ -13,29 +13,28 @@ interface MessageTemplateEditorProps {
     callbackSave: (template: string) => void; // Callback for saving the template
 }
 
+interface TextareaObject {
+    parent: number[],
+    type:string,
+    value:string
+}
 
 function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageTemplateEditorProps) {
     const [showPreview, setShowPreview] = useState(false);
     const [activeTextareaRef, setActiveTextareaRef] = useState<{ index: number; textarea: HTMLTextAreaElement } | null>(null);
     const [textareas, setTextareas] = useState<{index:number, node:React.ReactNode}[]>([{index: 0, node: <Textarea index={0} setTextareaRef={setActiveTextareaRef}/>}]);
 
-    const [fields , setFields] = useState<{index:number, parent: [], type:string, value:string}[]>([{index: 0, parent: [], type:'text', value:'test'}])
 
+    const [fields , setFields] = useState<TextareaObject[]>([{parent: [0], type:'text', value:'test'}])
+    const [focusedField, setFocusedFiled] = useState<{ parent: number[]; textarea: HTMLTextAreaElement } | null>(null);
 
     //*
     //
-    // 0 [] ""
-    //  1 [0]
-    //  2 [0]
-    //  3 [0]
-    //    4 [0, 3]
-    //    5 [0, 3]
-    //  4 [0]
-    //   6 [4, 0]
-    //   7 [4, 0]
-    //   8 [4, 0]
-    //      10 [4, 0, 8]
-    //  9 [4, 0]
+    //  [0] ""
+    //   [0, 1]
+    //   [0, 2]
+    //   [0, 3]
+    //  [0, 4]
     // */
 
     const handleSave = () => {
@@ -110,34 +109,24 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
 
 
     const handleAddTextarea = () => {
-        if (!activeTextareaRef || activeTextareaRef.textarea.readOnly) return;
+        if (!focusedField || focusedField.textarea.readOnly) return;
 
-        const textarea = activeTextareaRef.textarea;
+        const textarea = focusedField.textarea;
         const newTextareaValue = textarea.value.slice(textarea.selectionStart || 0);
         // Old Textarea value - before the cursor
         textarea.value = textarea.value.slice(0, textarea.selectionStart || 0);
 
 
         // const conditionsWidth = textarea.clientWidth / 458.4 * 100;
-        // const createCondition = (index: number, type: string, color: string, readOnly: boolean = false) => {
-        //     return (
-        //         <MessageCondition
-        //             index={index}
-        //             type={type}
-        //             ReadOnly={readOnly}
-        //             widthStyle={{width: `${conditionsWidth}%`}}
-        //             labelStyle={{color}}
-        //             deleteCondition={handleDeleteCondition}
-        //             setTextareaRef={setActiveTextareaRef}
-        //         />
-        //     );
-        // };
-        //
-        // const thisConditionIndex = textareas.length;
-        // const newIFCondition = createCondition(thisConditionIndex, 'IF', '#5785EEFF', true);
-        // const newTHENCondition = createCondition(thisConditionIndex + 1, 'THEN', '#a6409f');
-        // const newELSECondition = createCondition(thisConditionIndex + 2, 'ELSE', '#6fa5d3');
-        //
+
+        const thisConditionIndex = fields.length;
+        const newIFCondition:TextareaObject ={parent:[...focusedField.parent, thisConditionIndex], type:'if', value:''};
+        const newTHENCondition:TextareaObject = {parent:[...focusedField.parent, thisConditionIndex+1], type:'then', value:''};
+        const newELSECondition:TextareaObject = {parent:[...focusedField.parent, thisConditionIndex+2], type:'else', value:''};
+        const newTextarea:TextareaObject = {parent:[...focusedField.parent, thisConditionIndex+3], type:'text', value:newTextareaValue};
+
+
+
         // const thisTextareaIndex = textareas.length;
         // const newTextarea = (
         //     <Textarea
@@ -148,17 +137,17 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         //     />
         // );
         //
-        // const targetIndex = textareas.findIndex(obj => obj.index === activeTextareaRef.index);
-        // const newTextareas = [
-        //     ...textareas.slice(0, targetIndex + 1),
-        //     {index: thisConditionIndex, node: newIFCondition},
-        //     {index: thisConditionIndex + 1, node: newTHENCondition},
-        //     {index: thisConditionIndex + 2, node: newELSECondition},
-        //     {index: thisTextareaIndex + 3, node: newTextarea},
-        //     ...textareas.slice(targetIndex + 1)
-        // ];
-        //
-        // setTextareas(newTextareas);
+        const targetIndex = fields.findIndex(obj => obj.parent === focusedField.parent);
+        const newTextareas = [
+            ...textareas.slice(0, targetIndex + 1),
+            {index: thisConditionIndex, node: newIFCondition},
+            {index: thisConditionIndex + 1, node: newTHENCondition},
+            {index: thisConditionIndex + 2, node: newELSECondition},
+            {index: thisTextareaIndex + 3, node: newTextarea},
+            ...textareas.slice(targetIndex + 1)
+        ];
+
+        setTextareas(newTextareas);
 
 
     };
@@ -183,7 +172,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             {/*))}*/}
 
             {fields.map((component) => (
-                <Textarea index={0} value={component.value} setTextareaRef={setActiveTextareaRef}/>
+                <Textarea parent={component.parent} value={component.value} setTextareaRef={setFocusedFiled}/>
             )) }
 
             <MessageEditorButton

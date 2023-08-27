@@ -9,16 +9,16 @@ const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => 
 interface TextareaProps {
     value?: string;
     ReadOnly?:boolean;
-    index:number;
+    parent:number[];
     style?: CSSProperties;
-    setTextareaRef: (editor: { index: number; textarea: HTMLTextAreaElement } | null) => void;
+    setTextareaRef: (editor: { parent: number[]; textarea: HTMLTextAreaElement } | null) => void;
 }
-const Textarea = ({ value, index, style, ReadOnly, setTextareaRef}:TextareaProps) => {
+const Textarea = ({ value, parent, style, ReadOnly, setTextareaRef}:TextareaProps) => {
 
     return (
         <textarea
             onChange={handleTextareaChange}
-            onFocus={(event) => {setTextareaRef({index:index, textarea: event.target})}}
+            onFocus={(event) => {setTextareaRef({parent:parent, textarea: event.target})}}
             className={styles.textarea}
             style={style}
             defaultValue={value}
