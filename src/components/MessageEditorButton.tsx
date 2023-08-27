@@ -1,7 +1,7 @@
 import styles from './MessageEditorButton.module.css'; // Import the CSS module
 
 interface MessageEditorButtonProps {
-    onClick: () => void; // This will be the click handler for opening the message editor
+    onClick: () => void;
     name : string;
 
 }

@@ -19,7 +19,24 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
     const [activeTextareaRef, setActiveTextareaRef] = useState<{ index: number; textarea: HTMLTextAreaElement } | null>(null);
     const [textareas, setTextareas] = useState<{index:number, node:React.ReactNode}[]>([{index: 0, node: <Textarea index={0} setTextareaRef={setActiveTextareaRef}/>}]);
 
+    const [fields , setFields] = useState<{index:number, parent: [], type:string, value:string}[]>([{index: 0, parent: [], type:'text', value:'test'}])
 
+
+    //*
+    //
+    // 0 [] ""
+    //  1 [0]
+    //  2 [0]
+    //  3 [0]
+    //    4 [0, 3]
+    //    5 [0, 3]
+    //  4 [0]
+    //   6 [4, 0]
+    //   7 [4, 0]
+    //   8 [4, 0]
+    //      10 [4, 0, 8]
+    //  9 [4, 0]
+    // */
 
     const handleSave = () => {
         // Converting textarea and other blocks to object and stringifing
@@ -79,6 +96,17 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         }
     };
 
+    const handleDeleteCondition = () => {
+        console.log(textareas);
+        if(activeTextareaRef){
+
+            // activeTextareaRef.textarea.value += textareas[conditionIndex+2]?.node?.toString();
+        }
+        // setTextareas(textareas);
+        // setTextareas(prevTextareas =>
+        //     prevTextareas.filter(textarea => !([conditionIndex, conditionIndex + 1, conditionIndex + 2].includes(textarea.index)))
+        // );
+    }
 
 
     const handleAddTextarea = () => {
@@ -88,46 +116,51 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         const newTextareaValue = textarea.value.slice(textarea.selectionStart || 0);
         // Old Textarea value - before the cursor
         textarea.value = textarea.value.slice(0, textarea.selectionStart || 0);
-        const conditionsWidth = textarea.clientWidth;
 
-        const createCondition = (index: number, type: string, color: string, readOnly:boolean=false) => {
-            return (
-                <MessageCondition
-                    index={index}
-                    type={type}
-                    ReadOnly={readOnly}
-                    widthStyle={{ width: `${conditionsWidth}px` }}
-                    labelStyle={{ color }}
-                    setTextareaRef={setActiveTextareaRef}
-                />
-            );
-        };
 
-        const thisConditionIndex = textareas.length;
-        const newIFCondition = createCondition(thisConditionIndex, 'IF', '#5785EEFF', true);
-        const newTHENCondition = createCondition(thisConditionIndex + 1, 'THEN', '#a6409f');
-        const newELSECondition = createCondition(thisConditionIndex + 2, 'ELSE', '#6fa5d3');
+        // const conditionsWidth = textarea.clientWidth / 458.4 * 100;
+        // const createCondition = (index: number, type: string, color: string, readOnly: boolean = false) => {
+        //     return (
+        //         <MessageCondition
+        //             index={index}
+        //             type={type}
+        //             ReadOnly={readOnly}
+        //             widthStyle={{width: `${conditionsWidth}%`}}
+        //             labelStyle={{color}}
+        //             deleteCondition={handleDeleteCondition}
+        //             setTextareaRef={setActiveTextareaRef}
+        //         />
+        //     );
+        // };
+        //
+        // const thisConditionIndex = textareas.length;
+        // const newIFCondition = createCondition(thisConditionIndex, 'IF', '#5785EEFF', true);
+        // const newTHENCondition = createCondition(thisConditionIndex + 1, 'THEN', '#a6409f');
+        // const newELSECondition = createCondition(thisConditionIndex + 2, 'ELSE', '#6fa5d3');
+        //
+        // const thisTextareaIndex = textareas.length;
+        // const newTextarea = (
+        //     <Textarea
+        //         value={newTextareaValue}
+        //         index={thisTextareaIndex + 3}
+        //         style={{minHeight: '38px', width: '100%'}}
+        //         setTextareaRef={setActiveTextareaRef}
+        //     />
+        // );
+        //
+        // const targetIndex = textareas.findIndex(obj => obj.index === activeTextareaRef.index);
+        // const newTextareas = [
+        //     ...textareas.slice(0, targetIndex + 1),
+        //     {index: thisConditionIndex, node: newIFCondition},
+        //     {index: thisConditionIndex + 1, node: newTHENCondition},
+        //     {index: thisConditionIndex + 2, node: newELSECondition},
+        //     {index: thisTextareaIndex + 3, node: newTextarea},
+        //     ...textareas.slice(targetIndex + 1)
+        // ];
+        //
+        // setTextareas(newTextareas);
 
-        const thisTextareaIndex = textareas.length;
-        const newTextarea = (
-            <Textarea
-                value={newTextareaValue}
-                index={thisTextareaIndex + 3}
-                setTextareaRef={setActiveTextareaRef}
-            />
-        );
 
-        const targetIndex = textareas.findIndex(obj => obj.index === activeTextareaRef.index);
-        const newTextareas = [
-            ...textareas.slice(0, targetIndex + 1),
-            { index: thisConditionIndex, node: newIFCondition },
-            { index: thisConditionIndex + 1, node: newTHENCondition },
-            { index: thisConditionIndex + 2, node: newELSECondition },
-            { index: thisTextareaIndex + 3, node: newTextarea },
-            ...textareas.slice(targetIndex + 1)
-        ];
-
-        setTextareas(newTextareas);
     };
 
 
@@ -141,22 +174,26 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             />
 
             <MessageEditorButton
-                onClick={handleAddTextarea}
                 name={'Add Condition'}
+                onClick={handleAddTextarea}
             />
 
-            {textareas.map((Textarea) => (
-                <div key={Textarea.index}>{Textarea.node}</div>
-            ))}
+            {/*{textareas.map((Textarea) => (*/}
+            {/*    <div key={Textarea.index}>{Textarea.node}</div>*/}
+            {/*))}*/}
+
+            {fields.map((component) => (
+                <Textarea index={0} value={component.value} setTextareaRef={setActiveTextareaRef}/>
+            )) }
 
             <MessageEditorButton
-                onClick={handleSave}
                 name={'Save template'}
+                onClick={handleSave}
 
             />
             <MessageEditorButton
-                onClick={handlePreview}
                 name={'Preview'}
+                onClick={handlePreview}
             />
 
 

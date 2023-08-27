@@ -15,6 +15,7 @@ interface MessagePreviewProps {
 * const templateObject = {
     userText: '',
     variables: [] as { position: number; name: string }[],
+    conditions: ...
 };
 * */
 const renderMessage = (template:string, values: { [name: string]: string }): string => {
