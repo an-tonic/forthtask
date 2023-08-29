@@ -1,9 +1,8 @@
 // components/MessageTemplateEditor.tsx
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import MessageVariables from './MessageVariables';
 import MessagePreview from './MessagePreview';
 import MessageEditorButton from './MessageEditorButton';
-import MessageCondition from "./MessageCondition";
 import styles from './MessageTemplateEditor.module.css';
 import Textarea from "./Textarea";
 
@@ -14,28 +13,19 @@ interface MessageTemplateEditorProps {
 }
 
 interface TextareaObject {
-    parent: number[],
+    style: {};
+    parent: number,
     type:string,
     value:string
 }
 
 function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageTemplateEditorProps) {
     const [showPreview, setShowPreview] = useState(false);
-    const [activeTextareaRef, setActiveTextareaRef] = useState<{ index: number; textarea: HTMLTextAreaElement } | null>(null);
-    const [textareas, setTextareas] = useState<{index:number, node:React.ReactNode}[]>([{index: 0, node: <Textarea index={0} setTextareaRef={setActiveTextareaRef}/>}]);
+    const textareasRef = useRef<HTMLDivElement | null>(null);
 
+    const [fields , setFields] = useState<TextareaObject[]>([{parent: -1, type:'text', value:'test', style:{divWidth:'100%'}}])
+    const [focusedField, setFocusedField] = useState<{ index: number; textarea: HTMLTextAreaElement } | null>(null);
 
-    const [fields , setFields] = useState<TextareaObject[]>([{parent: [0], type:'text', value:'test'}])
-    const [focusedField, setFocusedFiled] = useState<{ parent: number[]; textarea: HTMLTextAreaElement } | null>(null);
-
-    //*
-    //
-    //  [0] ""
-    //   [0, 1]
-    //   [0, 2]
-    //   [0, 3]
-    //  [0, 4]
-    // */
 
     const handleSave = () => {
         // Converting textarea and other blocks to object and stringifing
@@ -70,13 +60,22 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         handleSave();
         setShowPreview(!showPreview);
     }
+    const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        event.target.style.height = 0 + 'px';
+        event.target.style.height = event.target.scrollHeight + 'px';
+
+        const updatedFields = [...fields];
+        updatedFields[focusedField!.index].value = event.target.value;
+
+        setFields(updatedFields);
+    };
+
 
     const handleInsertVariable = async (variableName: string) => {
-        // Insert the selected variable at the cursor position in the editor field
 
-        if (activeTextareaRef) {
+        if (focusedField) {
 
-            const textarea = activeTextareaRef.textarea;
+            const textarea = focusedField.textarea;
             // Delete
             if(textarea.readOnly && textarea.textLength > 0){
                 textarea.value = `{${variableName}}`;
@@ -85,27 +84,38 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             const startPos = textarea.selectionStart || 0;
             const endPos = textarea.selectionEnd || 0;
 
-            textarea.value = textarea.value.slice(0, startPos) +
+            const newTextareaValue = textarea.value.slice(0, startPos) +
                 `{${variableName}}` +
                 textarea.value.slice(endPos);
 
+            const updatedFields = [...fields];
+
+            updatedFields[focusedField.index].value = newTextareaValue;
+
+            // Set the state using the updatedFields variable
+            setFields(updatedFields);
+
             textarea.focus();
-            const cursorPos = endPos + variableName.length + 2;
-            textarea.setSelectionRange(cursorPos, cursorPos);
+
         }
     };
 
-    const handleDeleteCondition = () => {
-        console.log(textareas);
-        if(activeTextareaRef){
+    const handleDeleteCondition = (textareaIdentifier: number) => {
 
-            // activeTextareaRef.textarea.value += textareas[conditionIndex+2]?.node?.toString();
-        }
-        // setTextareas(textareas);
-        // setTextareas(prevTextareas =>
-        //     prevTextareas.filter(textarea => !([conditionIndex, conditionIndex + 1, conditionIndex + 2].includes(textarea.index)))
-        // );
-    }
+        if (!focusedField || focusedField.textarea.readOnly) return;
+        let valueLastTextarea = ''
+
+        // Deleting fields with the same parent
+        const newFields = fields.filter(item => {
+            if(item.parent === focusedField.index){
+                valueLastTextarea = item.value;
+            }
+            return item.parent !== textareaIdentifier
+        })
+        // Stiching values before and after the condition
+        newFields[focusedField.index].value +=valueLastTextarea;
+        setFields(newFields);
+    };
 
 
     const handleAddTextarea = () => {
@@ -113,49 +123,36 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
 
         const textarea = focusedField.textarea;
         const newTextareaValue = textarea.value.slice(textarea.selectionStart || 0);
-        // Old Textarea value - before the cursor
-        textarea.value = textarea.value.slice(0, textarea.selectionStart || 0);
 
+        //Percentage of the new text areas - gives a width corresponding to focused textarea
+        const percentage = textarea.clientWidth / textareasRef.current!.clientWidth * 100 + '%';
 
-        // const conditionsWidth = textarea.clientWidth / 458.4 * 100;
+        const newTextaresStyles = {minHeight: '38px', width:'80%', divWidth:percentage};
 
-        const thisConditionIndex = fields.length;
-        const newIFCondition:TextareaObject ={parent:[...focusedField.parent, thisConditionIndex], type:'if', value:''};
-        const newTHENCondition:TextareaObject = {parent:[...focusedField.parent, thisConditionIndex+1], type:'then', value:''};
-        const newELSECondition:TextareaObject = {parent:[...focusedField.parent, thisConditionIndex+2], type:'else', value:''};
-        const newTextarea:TextareaObject = {parent:[...focusedField.parent, thisConditionIndex+3], type:'text', value:newTextareaValue};
-
-
-
-        // const thisTextareaIndex = textareas.length;
-        // const newTextarea = (
-        //     <Textarea
-        //         value={newTextareaValue}
-        //         index={thisTextareaIndex + 3}
-        //         style={{minHeight: '38px', width: '100%'}}
-        //         setTextareaRef={setActiveTextareaRef}
-        //     />
-        // );
-        //
-        const targetIndex = fields.findIndex(obj => obj.parent === focusedField.parent);
-        const newTextareas = [
-            ...textareas.slice(0, targetIndex + 1),
-            {index: thisConditionIndex, node: newIFCondition},
-            {index: thisConditionIndex + 1, node: newTHENCondition},
-            {index: thisConditionIndex + 2, node: newELSECondition},
-            {index: thisTextareaIndex + 3, node: newTextarea},
-            ...textareas.slice(targetIndex + 1)
+        const newTextareas:TextareaObject[] = [
+            {parent:focusedField.index, type:'if', value:'', style: newTextaresStyles},
+            {parent:focusedField.index, type:'then', value:'', style: newTextaresStyles},
+            {parent:focusedField.index, type:'else', value:'', style: newTextaresStyles},
+            {parent:focusedField.index, type:'text', value:newTextareaValue, style: {...newTextaresStyles, width: '100%'}}
         ];
 
-        setTextareas(newTextareas);
+        const targetIndex = focusedField.index + 1;
+        const updatedFields = [
+            ...fields.slice(0, targetIndex),
+            ...newTextareas,
+            ...fields.slice(targetIndex)
+        ];
+        // Old Textarea value - before the cursor
+        updatedFields[focusedField.index].value = textarea.value.slice(0, textarea.selectionStart || 0);
 
+        // Set the state using the updatedFields variable
+        setFields(updatedFields);
 
     };
 
 
-
     return (
-        <div className={styles.container}>
+        <div className={styles.container} >
             <h2>Message Template Editor</h2>
             <MessageVariables
                 arrVarNames={arrVarNames}
@@ -166,19 +163,23 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
                 name={'Add Condition'}
                 onClick={handleAddTextarea}
             />
-
-            {/*{textareas.map((Textarea) => (*/}
-            {/*    <div key={Textarea.index}>{Textarea.node}</div>*/}
-            {/*))}*/}
-
-            {fields.map((component) => (
-                <Textarea parent={component.parent} value={component.value} setTextareaRef={setFocusedFiled}/>
+            <div className={styles.textareas} ref={textareasRef}>
+                {fields.map((component, index) => (
+                <Textarea key={index}
+                          parent={component.parent}
+                          value={component.value}
+                          type={component.type}
+                          style={component.style}
+                          index={index}
+                          handelDelete={handleDeleteCondition}
+                          handleChange={handleTextareaChange}
+                          setTextareaRef={setFocusedField}/>
             )) }
+            </div>
 
             <MessageEditorButton
                 name={'Save template'}
                 onClick={handleSave}
-
             />
             <MessageEditorButton
                 name={'Preview'}

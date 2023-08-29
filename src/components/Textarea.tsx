@@ -1,30 +1,48 @@
 import styles from "./Textarea.module.css";
-import React, {CSSProperties} from "react";
+import React from "react";
+import MessageEditorButton from "./MessageEditorButton";
 
-const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    event.target.style.height = 0 + 'px' ;
-    event.target.style.height = event.target.scrollHeight + "px";
 
-};
 interface TextareaProps {
     value?: string;
-    ReadOnly?:boolean;
-    parent:number[];
-    style?: CSSProperties;
-    setTextareaRef: (editor: { parent: number[]; textarea: HTMLTextAreaElement } | null) => void;
+    type?:string
+    parent:number;
+    index:number;
+    style?: {
+        width?:string;
+        minHeight?:string;
+        divWidth?:string;
+    };
+    handelDelete?: (textareaParents: number) => void;
+    handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    setTextareaRef: (editor: { index: number; textarea: HTMLTextAreaElement } | null) => void;
 }
-const Textarea = ({ value, parent, style, ReadOnly, setTextareaRef}:TextareaProps) => {
+const Textarea = ({ value, parent, index, style, type, handelDelete, handleChange, setTextareaRef}:TextareaProps) => {
+    let readOnly = false;
+
+
+    if(type === 'text'){
+        type = '';
+    } else if(type === 'if'){
+        readOnly = true;
+    }
 
     return (
-        <textarea
-            onChange={handleTextareaChange}
-            onFocus={(event) => {setTextareaRef({parent:parent, textarea: event.target})}}
-            className={styles.textarea}
-            style={style}
-            defaultValue={value}
-            rows={1}
-            readOnly={ReadOnly}
-        ></textarea>
+        <div className={styles.condition} style={{width: style?.divWidth, margin:'3px 0'}}>
+            <label className={styles.label}> {type?.toUpperCase()} </label>
+            {type === 'if' && handelDelete && <MessageEditorButton onClick={() => handelDelete(parent)} name={'x'} style={{padding:"5px 9px"}}/> }
+
+            <textarea
+                onChange={(e) => handleChange(e)}
+                onFocus={(event) => {setTextareaRef({index:index, textarea: event.target})}}
+                className={styles.textarea}
+                style={{ width: style?.width, minHeight: style?.minHeight}}
+                value={value}
+                rows={1}
+                readOnly={readOnly}
+            ></textarea>
+        </div>
+
     );
 };
 
