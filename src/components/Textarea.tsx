@@ -4,20 +4,20 @@ import MessageEditorButton from "./MessageEditorButton";
 
 
 interface TextareaProps {
+    index:number;
     value?: string;
     type?:string
-    parent:number;
-    index:number;
+    parent:string;
     style?: {
         width?:string;
         minHeight?:string;
         divWidth?:string;
     };
-    handelDelete?: (textareaParents: number) => void;
+    handelDelete?: (textareaParents: string) => void;
     handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     setTextareaRef: (editor: { index: number; textarea: HTMLTextAreaElement } | null) => void;
 }
-const Textarea = ({ value, parent, index, style, type, handelDelete, handleChange, setTextareaRef}:TextareaProps) => {
+const Textarea = ({ index, value, parent, style, type, handelDelete, handleChange, setTextareaRef}:TextareaProps) => {
     let readOnly = false;
 
 
