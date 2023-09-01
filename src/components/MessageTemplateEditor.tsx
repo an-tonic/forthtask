@@ -1,11 +1,14 @@
 // components/MessageTemplateEditor.tsx
 import React, {useState, useRef} from 'react';
+import { useFields } from './useFields';
+import Textarea from "./Textarea";
 import MessageVariables from './MessageVariables';
 import MessagePreview from './MessagePreview';
 import MessageEditorButton from './MessageEditorButton';
 import styles from './MessageTemplateEditor.module.css';
-import Textarea from "./Textarea";
+
 import { nanoid } from 'nanoid'
+import {TextareaObject} from "../utils/helpers";
 
 interface MessageTemplateEditorProps {
     arrVarNames: string[]; // Array of variable names
@@ -13,50 +16,44 @@ interface MessageTemplateEditorProps {
     callbackSave: (template: string) => void; // Callback for saving the template
 }
 
-interface TextareaObject {
-    id: string,
-    parent: string,
-    type:string,
-    style: {};
-    value:string
-}
 
 function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageTemplateEditorProps) {
     const [showPreview, setShowPreview] = useState(false);
     const textareasRef = useRef<HTMLDivElement | null>(null);
 
+    const {fields, setFields} = useFields(template);
 
-    const [fields , setFields] = useState<TextareaObject[]>([{id:nanoid(4), parent:'', type:'text', value:'test', style:{divWidth:'100%'}}])
     const [focusedField, setFocusedField] = useState<{ index: number; textarea: HTMLTextAreaElement } | null>(null);
+
 
 
 
     const handleSave = () => {
         // Converting textarea and other blocks to object and stringifing
-        const templateObject = {
-            userText: '',
-            variables: [] as { position: number; name: string }[],
-        };
+        // const templateObject = {
+        //     userText: '',
+        //     variables: [] as { position: number; name: string }[],
+        // };
+        //
+        // let cleanText = "";
+        // let currentPosition = 0;
+        //
+        // for (const varName of arrVarNames) {
+        //     const variablePattern = new RegExp(`{${varName}}`, '');
+        //     let match = variablePattern.exec(cleanText);
+        //
+        //     while (match !== null) {
+        //         templateObject.variables.push({ position: currentPosition + match.index, name: varName });
+        //         match = variablePattern.exec(cleanText);
+        //     }
+        //
+        //     cleanText = cleanText.replace(variablePattern, '');
+        //     currentPosition += varName.length + 2;
+        // }
+        //
+        // templateObject.userText = cleanText;
 
-        let cleanText = "";
-        let currentPosition = 0;
-
-        for (const varName of arrVarNames) {
-            const variablePattern = new RegExp(`{${varName}}`, '');
-            let match = variablePattern.exec(cleanText);
-
-            while (match !== null) {
-                templateObject.variables.push({ position: currentPosition + match.index, name: varName });
-                match = variablePattern.exec(cleanText);
-            }
-
-            cleanText = cleanText.replace(variablePattern, '');
-            currentPosition += varName.length + 2;
-        }
-
-        templateObject.userText = cleanText;
-
-        const serializedTemplate = JSON.stringify(templateObject);
+        const serializedTemplate = JSON.stringify(fields);
         callbackSave(serializedTemplate);
     };
 
@@ -64,6 +61,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         handleSave();
         setShowPreview(!showPreview);
     }
+
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         event.target.style.height = 0 + 'px';
         event.target.style.height = event.target.scrollHeight + 'px';
