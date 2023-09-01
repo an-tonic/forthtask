@@ -1,5 +1,5 @@
 // components/MessagePreview.tsx
-import React, { useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from './MessagePreview.module.css';
 import MessageEditorButton from "./MessageEditorButton";
 
@@ -21,19 +21,29 @@ interface MessagePreviewProps {
 const renderMessage = (template:string, values: { [name: string]: string }): string => {
     const deserializedTemplate = JSON.parse(template);
 
-    const { userText, variables } = deserializedTemplate;
+    let renderedText = '';
 
-    let renderedText = userText;
-
-    for (const variable of variables.sort((a: { position: number; }, b: { position: number; }) => b.position - a.position)) {
-        if(variable.name in values){
-            renderedText = [
-                renderedText.slice(0, variable.position),
-                values[variable.name],
-                renderedText.slice(variable.position),
-            ].join('');
+    deserializedTemplate.map((area: { value: string; type: string }, index:number) => {
+        let newArea = '';
+        if(area.type === 'if' && values[area.value.slice(1, -1)] !== ''){
+            newArea = deserializedTemplate[index+1].value;
         }
-    }
+        else if(area.type === 'if' && values[area.value.slice(1, -1)] === ''){
+            newArea = deserializedTemplate[index+2].value;
+        }
+        else if( area.type === 'text'){
+            newArea = area.value;
+        }
+
+
+        for (let val in values){
+            const searchVal = `{${val}}`;
+            newArea = newArea.replaceAll(searchVal, values[val]);
+
+        }
+        renderedText += newArea;
+    })
+
 
     return renderedText;
 
@@ -42,14 +52,21 @@ const renderMessage = (template:string, values: { [name: string]: string }): str
 
 
 function MessagePreview({ arrVarNames, template, onClick }: MessagePreviewProps) {
-    const [inputValues, setInputValues] = useState<{ [key: string]: string }>({});
-    const [message, setMessage] = useState<string>(JSON.parse(template)?.userText || null);
+    const [inputValues, setInputValues] = useState<{ [key: string]: string }>(
+        Object.fromEntries(arrVarNames.map(key => [key, '']))
+    );
+
+    const [message, setMessage] = useState<string>();
+    useEffect(() => {
+        setMessage(renderMessage(template, inputValues));
+    }, []);
 
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>, varName: string) => {
         const updatedValues = {...inputValues, [varName]: event.target.value};
         setInputValues(updatedValues);
 
         const result = renderMessage(template, updatedValues);
+        console.log(result);
         setMessage(result);
     };
 

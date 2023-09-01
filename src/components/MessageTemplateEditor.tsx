@@ -22,43 +22,16 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
     const textareasRef = useRef<HTMLDivElement | null>(null);
 
     const {fields, setFields} = useFields(template);
-
     const [focusedField, setFocusedField] = useState<{ index: number; textarea: HTMLTextAreaElement } | null>(null);
 
 
-
-
     const handleSave = () => {
-        // Converting textarea and other blocks to object and stringifing
-        // const templateObject = {
-        //     userText: '',
-        //     variables: [] as { position: number; name: string }[],
-        // };
-        //
-        // let cleanText = "";
-        // let currentPosition = 0;
-        //
-        // for (const varName of arrVarNames) {
-        //     const variablePattern = new RegExp(`{${varName}}`, '');
-        //     let match = variablePattern.exec(cleanText);
-        //
-        //     while (match !== null) {
-        //         templateObject.variables.push({ position: currentPosition + match.index, name: varName });
-        //         match = variablePattern.exec(cleanText);
-        //     }
-        //
-        //     cleanText = cleanText.replace(variablePattern, '');
-        //     currentPosition += varName.length + 2;
-        // }
-        //
-        // templateObject.userText = cleanText;
-
         const serializedTemplate = JSON.stringify(fields);
         callbackSave(serializedTemplate);
     };
 
     const handlePreview = () =>  {
-        handleSave();
+
         setShowPreview(!showPreview);
     }
 
@@ -72,30 +45,29 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         setFields(updatedFields);
     };
 
-
     const handleInsertVariable = async (variableName: string) => {
 
         if (focusedField) {
 
             const textarea = focusedField.textarea;
-            // Delete
-            if(textarea.readOnly && textarea.textLength > 0){
-                textarea.value = `{${variableName}}`;
-                return;
-            }
             const startPos = textarea.selectionStart || 0;
             const endPos = textarea.selectionEnd || 0;
+            const bracketVar = `{${variableName}}`;
 
-            const newTextareaValue = textarea.value.slice(0, startPos) +
-                `{${variableName}}` +
+            let newTextareaValue = textarea.value.slice(0, startPos) +
+                bracketVar +
                 textarea.value.slice(endPos);
 
-            const updatedFields = [...fields];
+            // Delete this if text is allowed in if
+            if(textarea.readOnly && textarea.textLength > 0){
+                newTextareaValue = bracketVar;
+            }
 
+            const updatedFields = [...fields];
             updatedFields[focusedField.index].value = newTextareaValue;
 
-            setFields(updatedFields);
-
+            await setFields(updatedFields);
+            textarea.setSelectionRange(startPos + bracketVar.length, startPos + bracketVar.length);
             textarea.focus();
 
         }
@@ -112,21 +84,21 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             }
         });
 
-        let firstChildIndex = childrenToDelete.length - lastChildIndex;
-        // Merging values from the two adjustment fields
-        fields[firstChildIndex-1].value += fields[lastChildIndex+1].value;
         // Deleting the area after the last child: i.e. merging the fields
         childrenToDelete.push(fields[lastChildIndex+1].id);
         // Making sure the parent is not deleted - the fields above the delete if condition
         childrenToDelete.splice(0,1);
+
+        let firstChildIndex = lastChildIndex - childrenToDelete.length + 2;
+        // Merging values from the two adjustment fields
+        fields[firstChildIndex-1].value += fields[lastChildIndex+1].value;
+
         const filteredFields = fields.filter(field => !childrenToDelete.includes(field.id));
         // Attaching children of the bottom area to the top area, need to be done after filter, or the top area will delete
         filteredFields[firstChildIndex-1].id = childrenToDelete.pop()!;
 
         setFields(filteredFields);
     };
-
-
 
     const handleAddTextarea = () => {
         if (!focusedField || focusedField.textarea.readOnly) return;
@@ -137,15 +109,15 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         //Percentage of the new text areas - gives a width corresponding to focused textarea
         const percentage = textarea.clientWidth / textareasRef.current!.clientWidth * 100 + '%';
 
-        const newTextaresStyles = {minHeight: '38px', width:'80%', divWidth:percentage};
+        const newTextareasStyles = {minHeight: '38px', width:'80%', divWidth:percentage};
         const parentId = fields[focusedField.index].id;
         const grandParentId = fields[focusedField.index].parent;
 
         const newTextareas:TextareaObject[] = [
-            {id:nanoid(4), parent:parentId, type:'if', value:'', style: newTextaresStyles},
-            {id:nanoid(4), parent:parentId, type:'then', value:'', style: newTextaresStyles},
-            {id:nanoid(4), parent:parentId, type:'else', value:'', style: newTextaresStyles},
-            {id:nanoid(4), parent:grandParentId, type:'text', value:newTextareaValue, style: {...newTextaresStyles, width: '100%'}}
+            {id:nanoid(4), parent:parentId, type:'if', value:'', style: newTextareasStyles},
+            {id:nanoid(4), parent:parentId, type:'then', value:'', style: newTextareasStyles},
+            {id:nanoid(4), parent:parentId, type:'else', value:'', style: newTextareasStyles},
+            {id:nanoid(4), parent:grandParentId, type:'text', value:newTextareaValue, style: {...newTextareasStyles, width: '100%'}}
         ];
 
         const targetIndex = focusedField.index + 1;
@@ -206,7 +178,6 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
                 name={'Preview'}
                 onClick={handlePreview}
             />
-
 
             {showPreview && (
                 <MessagePreview

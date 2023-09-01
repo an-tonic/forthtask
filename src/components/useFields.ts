@@ -13,16 +13,17 @@ export function useFields(template: string) {
     }]);
 
     useEffect(() => {
+        let parsedFields;
         try {
-            const parsedFields = JSON.parse(template);
-
-            if (isTextareaObjectArray(parsedFields)) {
-                setFields(parsedFields);
-            } else {
-                console.error('Invalid JSON data format');
-            }
+            parsedFields = JSON.parse(template);
         } catch (error) {
             console.error('Error parsing JSON template:', error);
+        }
+
+        if (isTextareaObjectArray(parsedFields)) {
+            setFields(parsedFields);
+        } else {
+            console.error('Invalid JSON data format');
         }
     }, [template]);
 

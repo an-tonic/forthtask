@@ -2,8 +2,8 @@ export interface TextareaObject {
     id: string,
     parent: string,
     type:string,
+    value:string,
     style: {};
-    value:string
 }
 
 export function isTextareaObjectArray(data: any): data is TextareaObject[] {
