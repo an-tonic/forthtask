@@ -17,22 +17,19 @@ interface TextareaProps {
     handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     setTextareaRef: (editor: { index: number; textarea: HTMLTextAreaElement } | null) => void;
 }
-const Textarea = ({ index, value, parent, style, type, handelDelete, handleChange, setTextareaRef}:TextareaProps) => {
-    let readOnly = false;
+const Textarea = ({ index, value='', parent, style, type, handelDelete, handleChange, setTextareaRef}:TextareaProps) => {
 
-
+    const newlineMatches = Array.from(value.matchAll(/\n/g));
+    const numberOfRows = newlineMatches.length + 1;
+    const showDeleteButton = type === 'if' && handelDelete;
     if(type === 'text'){
         type = '';
-    } else if(type === 'if'){
-        readOnly = true;
     }
-    const newlineMatches = Array.from(value!.matchAll(/\n/g));
-    const numberOfRows = newlineMatches.length + 1;
 
     return (
         <div className={styles.condition} style={{width: style?.divWidth, margin:'3px 0'}}>
             <label className={styles.label}> {type?.toUpperCase()} </label>
-            {type === 'if' && handelDelete && <MessageEditorButton onClick={() => handelDelete(parent)} name={'x'} style={{padding:"5px 9px"}}/> }
+            {showDeleteButton  && <MessageEditorButton onClick={() => handelDelete(parent)} name={'x'} style={{padding:"5px 9px"}}/> }
 
             <textarea
                 onChange={(e) => handleChange(e)}
@@ -41,7 +38,6 @@ const Textarea = ({ index, value, parent, style, type, handelDelete, handleChang
                 style={{ width: style?.width, minHeight: style?.minHeight}}
                 value={value}
                 rows={numberOfRows}
-                readOnly={readOnly}
             ></textarea>
         </div>
 

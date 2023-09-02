@@ -33,7 +33,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
     const handlePreview = () =>  {
 
         setShowPreview(!showPreview);
-    }
+    };
 
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         event.target.style.height = 0 + 'px';
@@ -101,7 +101,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
     };
 
     const handleAddTextarea = () => {
-        if (!focusedField || focusedField.textarea.readOnly) return;
+        if (!focusedField) return;
 
         const textarea = focusedField.textarea;
         const newTextareaValue = textarea.value.slice(textarea.selectionStart || 0);

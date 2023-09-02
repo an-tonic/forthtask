@@ -10,9 +10,9 @@ interface VariableButtonsProps {
 function MessageVariables({ arrVarNames, onClick }: VariableButtonsProps) {
     return (
         <div className={styles.container}>
-            {arrVarNames.map((varName) => (
+            {arrVarNames.map((varName, index) => (
                 <button
-                    key={varName}
+                    key={index}
                     onClick={() => onClick(varName)}
                     className={styles.btn}
                 >
