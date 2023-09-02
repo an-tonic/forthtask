@@ -182,7 +182,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             {showPreview && (
                 <MessagePreview
                     arrVarNames={arrVarNames}
-                    template={template}
+                    template={JSON.stringify(fields)}
                     onClick={handlePreview}
                 />
             )}

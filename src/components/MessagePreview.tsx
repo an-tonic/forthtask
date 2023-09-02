@@ -22,26 +22,39 @@ const renderMessage = (template:string, values: { [name: string]: string }): str
     const deserializedTemplate = JSON.parse(template);
 
     let renderedText = '';
+    let childrenNotToRender:{ [type: string]: string[] } = {'if':[], 'then':[], 'else':[], 'text':[]};
 
-    deserializedTemplate.map((area: { value: string; type: string }, index:number) => {
-        let newArea = '';
-        if(area.type === 'if' && values[area.value.slice(1, -1)] !== ''){
-            newArea = deserializedTemplate[index+1].value;
-        }
-        else if(area.type === 'if' && values[area.value.slice(1, -1)] === ''){
-            newArea = deserializedTemplate[index+2].value;
-        }
-        else if( area.type === 'text'){
-            newArea = area.value;
+    deserializedTemplate.map((area:any) => {
+        const { type, parent, id, value } = area;
+
+        if(!childrenNotToRender[type]?.includes(parent)){
+            let newArea = '';
+            // True
+            if(type === 'if' && values[value.slice(1, -1)] !== ''){
+                childrenNotToRender['else'].push(parent);
+            }
+            // False
+            else if(type === 'if' && values[value.slice(1, -1)] === ''){
+                childrenNotToRender['then'].push(parent);
+            }
+            else if( type !== 'if'){
+                newArea = area.value;
+                for (let val in values){
+                    const searchVal = `{${val}}`;
+                    newArea = newArea.replaceAll(searchVal, values[val]);
+
+                }
+                renderedText += newArea;
+            }
+
+        } else {
+            childrenNotToRender['if'].push(id);
+            childrenNotToRender['then'].push(id);
+            childrenNotToRender['else'].push(id);
+            childrenNotToRender['text'].push(parent);
+
         }
 
-
-        for (let val in values){
-            const searchVal = `{${val}}`;
-            newArea = newArea.replaceAll(searchVal, values[val]);
-
-        }
-        renderedText += newArea;
     })
 
 
@@ -74,7 +87,7 @@ function MessagePreview({ arrVarNames, template, onClick }: MessagePreviewProps)
         <div className={styles.preview}>
             <div className={styles.previewContent}>
                 <h2 className={styles.previewHeader}>Preview</h2>
-                <p className={styles.previewText}>{message}</p>
+                <pre className={styles.previewText}>{message}</pre>
                 <div className={styles.inputContainer} >
                     {arrVarNames.map((varName) => (
                     <div key={varName} className={styles.inputContainer}>

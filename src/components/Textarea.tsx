@@ -26,6 +26,8 @@ const Textarea = ({ index, value, parent, style, type, handelDelete, handleChang
     } else if(type === 'if'){
         readOnly = true;
     }
+    const newlineMatches = Array.from(value!.matchAll(/\n/g));
+    const numberOfRows = newlineMatches.length + 1;
 
     return (
         <div className={styles.condition} style={{width: style?.divWidth, margin:'3px 0'}}>
@@ -38,7 +40,7 @@ const Textarea = ({ index, value, parent, style, type, handelDelete, handleChang
                 className={styles.textarea}
                 style={{ width: style?.width, minHeight: style?.minHeight}}
                 value={value}
-                rows={1}
+                rows={numberOfRows}
                 readOnly={readOnly}
             ></textarea>
         </div>
