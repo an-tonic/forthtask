@@ -27,12 +27,16 @@ export function isTextareaObjectArray(data: any): data is TextareaObject[] {
     return true;
 }
 function replaceVariables(areaValue: string, values: { [x: string]: string; }) {
+    // Do not substitute variables if the area is empty
+    if(!areaValue) return '';
+
     for (const val in values) {
         const searchVal = `{${val}}`;
         areaValue = areaValue.replaceAll(searchVal, values[val]);
     }
     return areaValue;
 }
+
 function findLastChildIndex(template:TextareaObject[], startIndex:number, parentId:string) {
     for (let i = template.length - 1; i >= startIndex; i--) {
         if (template[i].parent === parentId) {
@@ -50,7 +54,7 @@ export function renderMessage(template:TextareaObject[], values: { [name: string
         const { type, parent, id, value } = area;
 
         // Check if the current area should be rendered based on its type and parent
-        if(childrenNotToEvaluate[type]?.includes(parent)){
+        if(childrenNotToEvaluate[type].includes(parent)){
             // If the area should not be rendered, its children should also not be rendered
             childrenNotToEvaluate['if'].push(id);
             childrenNotToEvaluate['then'].push(id);
@@ -62,7 +66,7 @@ export function renderMessage(template:TextareaObject[], values: { [name: string
         let newArea = replaceVariables(value, values);
 
         if (type === 'if') {
-
+            // The children of this particular 'if' should not be rendered, since they will be, in the recursion call
             childrenNotToEvaluate['if'].push(id);
             childrenNotToEvaluate['then'].push(id);
             childrenNotToEvaluate['else'].push(id);
@@ -76,7 +80,7 @@ export function renderMessage(template:TextareaObject[], values: { [name: string
                 conditionMet = newArea;
             }
 
-            // Push children of the if-condition that we do not need to render
+            // Push children of the if-condition that we do not need to render (i.e. choosing 'else' or 'then')
             childrenNotToEvaluate[conditionMet ? 'else' : 'then'].push(parent);
         } else if (type !== 'if') {
             renderedText += newArea;

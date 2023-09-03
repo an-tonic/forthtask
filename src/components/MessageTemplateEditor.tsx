@@ -1,7 +1,6 @@
 // components/MessageTemplateEditor.tsx
 import React, {useState, useRef} from 'react';
 import { useFields } from './useFields';
-import Textarea from "./Textarea";
 import MessageVariables from './MessageVariables';
 import MessagePreview from './MessagePreview';
 import MessageEditorButton from './MessageEditorButton';
@@ -9,6 +8,7 @@ import styles from './MessageTemplateEditor.module.css';
 
 import { nanoid } from 'nanoid'
 import {TextareaObject} from "../utils/helpers";
+import TextareaList from "./TextareaList";
 
 interface MessageTemplateEditorProps {
     arrVarNames: string[]; // Array of variable names
@@ -36,6 +36,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
     };
 
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        console.log('event!');
         event.target.style.height = 0 + 'px';
         event.target.style.height = event.target.scrollHeight + 'px';
 
@@ -156,16 +157,14 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
                 name={'Add Condition'}
                 onClick={handleAddTextarea}
             />
-            <div className={styles.textareas} ref={textareasRef}>
-                {fields.map((component, index) => (
-                <Textarea key={index}
-                          index={index}
-                          area={component}
-                          handelDelete={handleDeleteCondition}
-                          handleChange={handleTextareaChange}
-                          setTextareaRef={setFocusedField}/>
-            )) }
-            </div>
+
+            <TextareaList
+                ref={textareasRef}
+                fields={fields}
+                handleDeleteCondition={handleDeleteCondition}
+                handleTextareaChange={handleTextareaChange}
+                setFocusedField={setFocusedField}
+            />
 
             <MessageEditorButton
                 name={'Save template'}
