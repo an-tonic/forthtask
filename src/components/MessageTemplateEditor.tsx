@@ -160,10 +160,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
                 {fields.map((component, index) => (
                 <Textarea key={index}
                           index={index}
-                          parent={component.parent}
-                          value={component.value}
-                          type={component.type}
-                          style={component.style}
+                          area={component}
                           handelDelete={handleDeleteCondition}
                           handleChange={handleTextareaChange}
                           setTextareaRef={setFocusedField}/>
@@ -182,7 +179,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             {showPreview && (
                 <MessagePreview
                     arrVarNames={arrVarNames}
-                    template={JSON.stringify(fields)}
+                    template={fields}
                     onClick={handlePreview}
                 />
             )}

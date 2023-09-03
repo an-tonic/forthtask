@@ -1,12 +1,13 @@
 // components/MessagePreview.tsx
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import styles from './MessagePreview.module.css';
 import MessageEditorButton from "./MessageEditorButton";
 import {renderMessage} from '../utils/helpers'
+import {TextareaObject} from "../utils/helpers";
 
 interface MessagePreviewProps {
     arrVarNames: string[];
-    template: string;
+    template: TextareaObject[];
     onClick: () => void;
 }
 
@@ -16,10 +17,8 @@ function MessagePreview({ arrVarNames, template, onClick }: MessagePreviewProps)
         Object.fromEntries(arrVarNames.map(key => [key, '']))
     );
 
-    const [message, setMessage] = useState<string>();
-    useEffect(() => {
-        setMessage(renderMessage(template, inputValues));
-    }, []);
+    const [message, setMessage] = useState<string>(renderMessage(template, inputValues));
+
 
     const handleInputChange = (varName: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const updatedValues = { ...inputValues, [varName]: event.target.value };
