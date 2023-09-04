@@ -26,15 +26,22 @@ export function isTextareaObjectArray(data: any): data is TextareaObject[] {
 
     return true;
 }
-function replaceVariables(areaValue: string, values: { [x: string]: string; }) {
-    // Do not substitute variables if the area is empty
-    if(!areaValue) return '';
+export function replaceVariables(areaValue: string, values: { [x: string]: string }): string {
+    // Use a regex to find all variable placeholders like {variableName}
+    const variableRegex = /\{([^{}]+)}/g;
+    let result = areaValue;
 
-    for (const val in values) {
-        const searchVal = `{${val}}`;
-        areaValue = areaValue.replaceAll(searchVal, values[val]);
-    }
-    return areaValue;
+    // Use the regex to find and replace all variable placeholders
+    result = result.replace(variableRegex, (match, variableName) => {
+        // Check if the variableName exists in the values object
+        if (values.hasOwnProperty(variableName)) {
+            return values[variableName]; // Replace with the corresponding value
+        } else {
+            return match; // Variable not found, so keep the original placeholder
+        }
+    });
+
+    return result;
 }
 
 function findLastChildIndex(template:TextareaObject[], startIndex:number, parentId:string) {
