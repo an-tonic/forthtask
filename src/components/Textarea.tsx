@@ -21,8 +21,8 @@ const Textarea = ({ index, area, handleCursorChange, handelDelete, handleChange,
     const newlineMatches = Array.from(value.matchAll(/\n/g));
     const numberOfRows = newlineMatches.length + 1;
     const showDeleteButton = type === 'if' && handelDelete;
-
-
+    // Calculate height of the textarea based on the amount of text
+    const textareaHeight = numberOfRows*22.4;
     return (
         <div className={styles.condition} style={{width: style?.divWidth}}>
             <label className={styles.label}> {type !== 'text' ? type.toUpperCase() : ''} </label>
@@ -34,7 +34,8 @@ const Textarea = ({ index, area, handleCursorChange, handelDelete, handleChange,
                 onMouseUp={(e) => handleCursorChange(e)}
                 onFocus={(event) => {setTextareaRef({index:index, textarea: event.target})}}
                 className={styles.textarea}
-                style={type === 'text' ? {width: '100%', minHeight: '100px'} : {}}
+                style={type === 'text' ? {width: '100%', minHeight: '112px', height:`${textareaHeight}px`} : {}}
+
                 value={value}
                 rows={numberOfRows}
             ></textarea>
