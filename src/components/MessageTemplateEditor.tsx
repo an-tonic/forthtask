@@ -110,7 +110,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         //Percentage of the new text areas - gives a width corresponding to focused textarea
         const percentage = textarea.clientWidth / textareasRef.current!.clientWidth * 100 + '%';
 
-        const newTextareasStyles = {minHeight: '38px', width:'80%', divWidth:percentage};
+        const newTextareasStyles = {divWidth:percentage};
         const parentId = fields[focusedField.index].id;
         const grandParentId = fields[focusedField.index].parent;
 
@@ -118,7 +118,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             {id:nanoid(4), parent:parentId, type:'if', value:'', style: newTextareasStyles},
             {id:nanoid(4), parent:parentId, type:'then', value:'', style: newTextareasStyles},
             {id:nanoid(4), parent:parentId, type:'else', value:'', style: newTextareasStyles},
-            {id:nanoid(4), parent:grandParentId, type:'text', value:newTextareaValue, style: {...newTextareasStyles, width: '100%'}}
+            {id:nanoid(4), parent:grandParentId, type:'text', value:newTextareaValue, style: newTextareasStyles}
         ];
 
         const targetIndex = focusedField.index + 1;

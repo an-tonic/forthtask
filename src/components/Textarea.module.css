@@ -1,7 +1,7 @@
 .textarea {
-    width: 100%;
+    width: 80%;
     /*height: auto; !* Set height to auto for auto-resizing *!*/
-    min-height: 100px; /* Set a minimum height */
+    min-height: 38px; /* Set a minimum height */
     resize: vertical; /* Disable vertical resizing */
     overflow-y: hidden;
     padding: 10px;
@@ -20,6 +20,7 @@
     align-items: center;
     justify-content: space-between;
     /*margin: 10px 0 10px auto;*/
+    margin:3px 0;
 }
 
 .label {
