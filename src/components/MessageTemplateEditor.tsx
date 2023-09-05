@@ -1,6 +1,6 @@
 // components/MessageTemplateEditor.tsx
 import React, {useState, useRef} from 'react';
-import { useFields } from './useFields';
+import { useFields } from '../hooks/useFields';
 import MessageVariables from './MessageVariables';
 import MessagePreview from './MessagePreview';
 import MessageEditorButton from './MessageEditorButton';
