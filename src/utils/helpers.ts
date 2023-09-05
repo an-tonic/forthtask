@@ -79,16 +79,20 @@ export function renderMessage(template:TextareaObject[], values: { [name: string
             childrenNotToEvaluate['if'].push(id);
             childrenNotToEvaluate['then'].push(id);
             childrenNotToEvaluate['else'].push(id);
+            childrenNotToEvaluate['text'].push(parent);
+
             // Find lastChild index
-            let lastChildIndex = findLastChildIndex(template, index, id);
+
             let conditionMet;
 
-            if(lastChildIndex > -1){
-                conditionMet = renderMessage(template.slice(index+1, lastChildIndex+2), values);
-            } else {
+            // If the 'if' has already some text, the consecutive children are absolite
+            if(newArea){
                 conditionMet = newArea;
+            } else {
+                // If there are children we try to render them
+                let lastChildIndex = findLastChildIndex(template, index, id);
+                if(lastChildIndex > -1) conditionMet = renderMessage(template.slice(index+1, lastChildIndex+2), values);
             }
-
             // Push children of the if-condition that we do not need to render (i.e. choosing 'else' or 'then')
             childrenNotToEvaluate[conditionMet ? 'else' : 'then'].push(parent);
         } else if (type !== 'if') {
