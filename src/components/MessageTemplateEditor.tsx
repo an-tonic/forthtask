@@ -39,6 +39,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
 
         setCursorPos(event.target.selectionStart);
     }
+    
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
 
         setCursorPos(event.target.selectionStart);
@@ -61,11 +62,6 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             let newTextareaValue = textarea.value.slice(0, startPos) +
                 bracketVar +
                 textarea.value.slice(endPos);
-
-            // Delete this if text is allowed in if
-            if(textarea.readOnly && textarea.textLength > 0){
-                newTextareaValue = bracketVar;
-            }
 
             const updatedFields = [...fields];
             updatedFields[focusedField.index].value = newTextareaValue;

@@ -2,7 +2,7 @@
     width: 80%;
     /*height: auto; !* Set height to auto for auto-resizing *!*/
     min-height: 38px; /* Set a minimum height */
-    resize: vertical; /* Disable vertical resizing */
+    resize: none; /* Disable vertical resizing */
     overflow-y: hidden;
     padding: 10px;
     border: 1px solid #ccc;

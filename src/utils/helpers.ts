@@ -29,7 +29,8 @@ export function isTextareaObjectArray(data: any): data is TextareaObject[] {
 export function replaceVariables(areaValue: string, values: { [x: string]: string }): string {
     // Use a regex to find all variable placeholders like {variableName}
     const variableRegex = /\{([^{}]+)}/g;
-    let result = areaValue;
+    let result = areaValue.trim();
+    if(result === '') return '';
 
     // Use the regex to find and replace all variable placeholders
     result = result.replace(variableRegex, (match, variableName) => {
@@ -59,6 +60,7 @@ export function renderMessage(template:TextareaObject[], values: { [name: string
 
     template.forEach((area:any, index:number) => {
         const { type, parent, id, value } = area;
+
 
         // Check if the current area should be rendered based on its type and parent
         if(childrenNotToEvaluate[type].includes(parent)){
