@@ -23,7 +23,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
 
     const {fields, setFields} = useFields(template);
     const [focusedField, setFocusedField] = useState<{ index: number; textarea: HTMLTextAreaElement } | null>(null);
-
+    const [cursorPos, setCursorPos] = useState<number>(0);
 
     const handleSave = () => {
         const serializedTemplate = JSON.stringify(fields);
@@ -35,10 +35,14 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         setShowPreview(!showPreview);
     };
 
+    const handleCursorPos = (event: any) =>{
+        setCursorPos(event.target.selectionStart);
+    }
     const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        console.log('event!');
+
         event.target.style.height = 0 + 'px';
         event.target.style.height = event.target.scrollHeight + 'px';
+        setCursorPos(event.target.selectionStart);
 
         const updatedFields = [...fields];
         updatedFields[focusedField!.index].value = event.target.value;
@@ -105,7 +109,8 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         if (!focusedField) return;
 
         const textarea = focusedField.textarea;
-        const newTextareaValue = textarea.value.slice(textarea.selectionStart || 0);
+
+        const newTextareaValue = textarea.value.slice(cursorPos);
 
         //Percentage of the new text areas - gives a width corresponding to focused textarea
         const percentage = textarea.clientWidth / textareasRef.current!.clientWidth * 100 + '%';
@@ -130,7 +135,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             ...fields.slice(targetIndex)
         ];
         // Old Textarea value - before the cursor
-        updatedFields[focusedField.index].value = textarea.value.slice(0, textarea.selectionStart || 0);
+        updatedFields[focusedField.index].value = textarea.value.slice(0, cursorPos);
 
         // Reattaching all children to a newly created field, so they would not be deleted
         for (let i = focusedField.index+4; i < updatedFields.length; i++){
@@ -161,6 +166,7 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
             <TextareaList
                 ref={textareasRef}
                 fields={fields}
+                handleCursorChange={handleCursorPos}
                 handleDeleteCondition={handleDeleteCondition}
                 handleTextareaChange={handleTextareaChange}
                 setFocusedField={setFocusedField}

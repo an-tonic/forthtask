@@ -5,18 +5,20 @@ import {TextareaObject} from "../utils/helpers";
 
 interface TextareaListProps{
     fields: TextareaObject[];
+    handleCursorChange: any;
     handleDeleteCondition: any;
     handleTextareaChange: any;
     setFocusedField: any;
 }
 
-function TextareaList({fields, handleDeleteCondition, handleTextareaChange, setFocusedField}:TextareaListProps, ref: React.LegacyRef<HTMLDivElement> | undefined){
+function TextareaList({fields, handleCursorChange, handleDeleteCondition, handleTextareaChange, setFocusedField}:TextareaListProps, ref: React.LegacyRef<HTMLDivElement> | undefined){
 
     return <div className={styles.textareas} ref={ref}>
         {fields.map((component, index) => (
             <Textarea key={index}
                       index={index}
                       area={component}
+                      handleCursorChange={handleCursorChange}
                       handelDelete={handleDeleteCondition}
                       handleChange={handleTextareaChange}
                       setTextareaRef={setFocusedField}/>

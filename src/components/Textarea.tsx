@@ -9,12 +9,13 @@ interface StyleProps{
 interface TextareaProps {
     index:number;
     area:{parent: string, type:string, value:string, style:StyleProps};
+    handleCursorChange: any;
     handelDelete?: (textareaParents: string) => void;
     handleChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     setTextareaRef: (editor: { index: number; textarea: HTMLTextAreaElement } | null) => void;
 }
 
-const Textarea = ({ index, area, handelDelete, handleChange, setTextareaRef}:TextareaProps) => {
+const Textarea = ({ index, area, handleCursorChange, handelDelete, handleChange, setTextareaRef}:TextareaProps) => {
     let {parent, type, value, style} = area;
 
     const newlineMatches = Array.from(value.matchAll(/\n/g));
@@ -29,6 +30,8 @@ const Textarea = ({ index, area, handelDelete, handleChange, setTextareaRef}:Tex
 
             <textarea
                 onChange={(e) => handleChange(e)}
+                onKeyUp={(e) => handleCursorChange(e)}
+                onMouseUp={(e) => handleCursorChange(e)}
                 onFocus={(event) => {setTextareaRef({index:index, textarea: event.target})}}
                 className={styles.textarea}
                 style={type === 'text' ? {width: '100%', minHeight: '100px'} : {}}
