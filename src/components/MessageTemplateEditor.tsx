@@ -136,6 +136,10 @@ function MessageTemplateEditor({ arrVarNames, template, callbackSave }: MessageT
         ];
         // Old Textarea value - before the cursor
         updatedFields[focusedField.index].value = textarea.value.slice(0, cursorPos);
+        // Resizing the focused area to contain removed text
+        textarea.value = textarea.value.slice(0, cursorPos);
+        textarea.style.height = 0 + 'px';
+        textarea.style.height = textarea.scrollHeight + 'px';
 
         // Reattaching all children to a newly created field, so they would not be deleted
         for (let i = focusedField.index+4; i < updatedFields.length; i++){
